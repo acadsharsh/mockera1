@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard - JEE Mock Test</title>
+    <link rel="stylesheet" href="../css/common.css">
+</head>
+<body>
+    <nav class="nav">
+        <ul class="nav-list">
+            <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+            <li><a href="upload-pdf.html" class="nav-link">Create New Test</a></li>
+            <li><span id="userName" style="margin-left: auto; color: #666;"></span></li>
+            <li><button onclick="logout()" class="btn btn-sm btn-secondary">Logout</button></li>
+        </ul>
+    </nav>
+
+<div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">My Tests</h1>
+                <p style="color: var(--gray-600); margin-top: 0.5rem;">Manage and create JEE mock tests</p>
+            </div>
+            <a href="upload-pdf.html" class="btn btn-primary btn-lg">
+                <span>➕</span>
+                <span>Create New Test</span>
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2.5rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">0</div>
+                <div style="color: var(--gray-600); font-weight: 600; margin-top: 0.5rem;">Total Tests</div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--success);">0</div>
+                <div style="color: var(--gray-600); font-weight: 600; margin-top: 0.5rem;">Published</div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--warning);">0</div>
+                <div style="color: var(--gray-600); font-weight: 600; margin-top: 0.5rem;">Drafts</div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--info);">0</div>
+                <div style="color: var(--gray-600); font-weight: 600; margin-top: 0.5rem;">Total Attempts</div>
+            </div>
+        </div>
+
+        <div id="testsContainer">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        requireAuth('creator');
+        
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = user.fullName;
+        
+        async function loadTests() {
+            try {
+                const data = await apiCall('/tests/my-tests');
+                displayTests(data.tests);
+            } catch (error) {
+                document.getElementById('testsContainer').innerHTML = 
+                    `<div class="error-message">Failed to load tests: ${error.message}</div>`;
+            }
+        }
+        
+        function displayTests(tests) {
+            const container = document.getElementById('testsContainer');
+            
+            if (tests.length === 0) {
+                container.innerHTML = `
+                    <div class="card text-center">
+                        <p style="color: #666; margin-bottom: 20px;">No tests created yet</p>
+                        <a href="upload-pdf.html" class="btn btn-primary">Create Your First Test</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="grid grid-2">
+                    ${tests.map(test => `
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                                <div>
+                                    <h3 style="color: #333; margin-bottom: 8px;">${test.title}</h3>
+                                    <p style="color: #666; font-size: 0.9rem;">${test.description || 'No description'}</p>
+                                </div>
+                                <span class="badge ${test.is_published ? 'badge-success' : 'badge-warning'}">
+                                    ${test.is_published ? 'Published' : 'Draft'}
+                                </span>
+                            </div>
+                            <div style="color: #666; font-size: 0.9rem; margin-bottom: 16px;">
+                                <div>📝 ${test.question_count || 0} Questions</div>
+                                <div>⏱️ ${test.duration_minutes} minutes</div>
+                                <div>📊 ${test.total_marks} marks</div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                ${!test.is_published ? `
+                                    <a href="upload-pdf.html?testId=${test.id}" class="btn btn-sm btn-primary">Add Questions</a>
+                                    <a href="test-settings.html?testId=${test.id}" class="btn btn-sm btn-secondary">Settings</a>
+                                    <button onclick="publishTest(${test.id})" class="btn btn-sm btn-success">Publish</button>
+                                ` : `
+                                    <a href="test-settings.html?testId=${test.id}" class="btn btn-sm btn-secondary">View Details</a>
+                                `}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        async function publishTest(testId) {
+            if (!confirm('Are you sure you want to publish this test? Students will be able to attempt it.')) {
+                return;
+            }
+            
+            try {
+                await apiCall(`/tests/${testId}/publish`, { method: 'POST' });
+                alert('Test published successfully!');
+                loadTests();
+            } catch (error) {
+                alert('Failed to publish test: ' + error.message);
+            }
+        }
+        
+        loadTests();
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Test - JEE Mock Test</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Create New Test</h1>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+
+        <div class="content-card">
+            <div id="testSetup">
+                <h2 style="margin-bottom: 20px;">Test Details</h2>
+                <div class="form-group">
+                    <label>Test Name</label>
+                    <input type="text" id="testName" placeholder="e.g., JEE Main Mock Test 1">
+                </div>
+                
+                <div class="form-group">
+                    <label>Duration (minutes)</label>
+                    <input type="number" id="testDuration" value="180">
+                </div>
+
+                <div class="form-group">
+                    <label>Total Questions</label>
+                    <input type="number" id="totalQuestions" value="75">
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>Physics Questions</label>
+                        <input type="number" id="physicsCount" value="25">
+                    </div>
+                    <div class="form-group">
+                        <label>Chemistry Questions</label>
+                        <input type="number" id="chemistryCount" value="25">
+                    </div>
+                    <div class="form-group">
+                        <label>Mathematics Questions</label>
+                        <input type="number" id="mathsCount" value="25">
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Marking Scheme</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div class="form-group">
+                        <label>Marks for Correct Answer</label>
+                        <input type="number" id="correctMarks" value="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Negative Marks (Incorrect)</label>
+                        <input type="number" id="negativeMarks" value="-1" step="0.1">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="startAddingQuestions()" style="width: 100%; margin-top: 20px;">
+                    Next: Add Questions
+                </button>
+            </div>
+
+            <div id="questionAdder" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Add Questions (<span id="currentQuestionNumber">1</span> / <span id="totalQuestionCount">75</span>)</h2>
+                    <button class="btn btn-secondary" onclick="backToSetup()">← Back</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Section</label>
+                    <select id="questionSection">
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Mathematics">Mathematics</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Question Image</label>
+                    <input type="file" id="questionImage" accept="image/*">
+                    <div id="imagePreview" style="margin-top: 15px;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Question Type</label>
+                    <select id="questionType" onchange="updateAnswerInputs()">
+                        <option value="mcq">Multiple Choice (Single Correct)</option>
+                        <option value="numerical">Numerical Answer</option>
+                    </select>
+                </div>
+
+                <div id="mcqOptions">
+                    <div class="form-group">
+                        <label>Correct Answer</label>
+                        <select id="correctAnswer">
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="numericalOptions" style="display: none;">
+                    <div class="form-group">
+                        <label>Correct Numerical Answer</label>
+                        <input type="number" id="numericalAnswer" step="0.01" placeholder="Enter numerical value">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="saveQuestion()">
+                        Save & Next Question
+                    </button>
+                    <button class="btn btn-success" onclick="finishTest()">
+                        Finish & Save Test
+                    </button>
+                </div>
+
+                <div id="addedQuestions" style="margin-top: 30px;">
+                    <h3>Added Questions</h3>
+                    <div id="questionsList" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <div id="testSaved" style="display: none; text-align: center; padding: 40px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+                <h2>Test Created Successfully!</h2>
+                <p style="margin: 20px 0; color: #666;">Your test has been saved and is ready to attempt.</p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <a href="create-test.html" class="btn btn-primary">Create Another Test</a>
+                    <a href="attempt-test.html" class="btn btn-success">Attempt Test</a>
+                    <a href="index.html" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/create-test.js"></script>
+</body>
+</html>

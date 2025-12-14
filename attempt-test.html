@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attempt Test - JEE Mock Test</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="testSelection" class="content-card" style="max-width: 800px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1>Select Test to Attempt</h1>
+                <a href="index.html" class="back-link">← Back to Home</a>
+            </div>
+
+            <div id="testList"></div>
+
+            <div id="noTests" style="text-align: center; padding: 60px 20px; display: none;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">📝</div>
+                <h2 style="color: #666;">No Tests Available</h2>
+                <p style="margin: 20px 0;">Create a test first to get started.</p>
+                <a href="create-test.html" class="btn btn-primary">Create Test</a>
+            </div>
+        </div>
+
+        <div id="testInterface" style="display: none;">
+            <div class="page-header">
+                <div>
+                    <h1 id="testTitle">Test Name</h1>
+                    <p id="testInfo" style="color: #666; margin-top: 5px;"></p>
+                </div>
+                <div class="timer">
+                    <div style="font-size: 0.9rem; margin-bottom: 5px;">Time Remaining</div>
+                    <div class="timer-value" id="timerDisplay">03:00:00</div>
+                </div>
+            </div>
+
+            <div class="test-layout">
+                <div class="test-main">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Question <span id="currentQuestionNum">1</span></h2>
+                        <div>
+                            <span style="background: #f0f0f0; padding: 8px 15px; border-radius: 6px; font-weight: 600;">
+                                Section: <span id="currentSection">Physics</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="questionContent">
+                        <img id="questionImage" class="question-image" alt="Question">
+                    </div>
+
+                    <div id="answerSection">
+                        <!-- MCQ Options -->
+                        <div id="mcqAnswers" class="options-grid">
+                            <button class="option-btn" data-option="A" onclick="selectOption('A')">
+                                <strong>A.</strong> Option A
+                            </button>
+                            <button class="option-btn" data-option="B" onclick="selectOption('B')">
+                                <strong>B.</strong> Option B
+                            </button>
+                            <button class="option-btn" data-option="C" onclick="selectOption('C')">
+                                <strong>C.</strong> Option C
+                            </button>
+                            <button class="option-btn" data-option="D" onclick="selectOption('D')">
+                                <strong>D.</strong> Option D
+                            </button>
+                        </div>
+
+                        <!-- Numerical Answer -->
+                        <div id="numericalAnswer" style="display: none;">
+                            <div class="form-group">
+                                <label>Enter your numerical answer:</label>
+                                <input type="number" id="numericalInput" step="0.01" 
+                                       placeholder="Enter value" style="font-size: 1.2rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <div>
+                            <button class="btn btn-secondary" onclick="markForReview()">
+                                🔖 Mark for Review
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearResponse()">
+                                ❌ Clear Response
+                            </button>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="previousQuestion()">
+                                ← Previous
+                            </button>
+                            <button class="btn btn-primary" onclick="nextQuestion()">
+                                Next →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-sidebar">
+                    <h3 style="margin-bottom: 15px;">Question Palette</h3>
+                    
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color answered"></div>
+                            <span>Answered</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color not-answered"></div>
+                            <span>Not Answered</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color marked"></div>
+                            <span>Marked</span>
+                        </div>
+                    </div>
+
+                    <div style="margin: 20px 0;">
+                        <select id="sectionFilter" onchange="filterBySection()" 
+                                style="width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #e0e0e0;">
+                            <option value="all">All Sections</option>
+                            <option value="Physics">Physics</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Mathematics">Mathematics</option>
+                        </select>
+                    </div>
+
+                    <div class="question-palette" id="questionPalette"></div>
+
+                    <button class="btn btn-success" onclick="submitTest()" 
+                            style="width: 100%; margin-top: 20px;">
+                        Submit Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/attempt-test.js"></script>
+</body>
+</html>

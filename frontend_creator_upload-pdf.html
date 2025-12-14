@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF - JEE Mock Test</title>
+    <link rel="stylesheet" href="../css/common.css">
+</head>
+<body>
+    <nav class="nav">
+        <ul class="nav-list">
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            <li><a href="upload-pdf.html" class="nav-link active">Create Test</a></li>
+            <li><button onclick="logout()" class="btn btn-sm btn-secondary" style="margin-left: auto;">Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Create New Test</h1>
+            <a href="dashboard.html" class="btn btn-secondary">Back</a>
+        </div>
+
+        <!-- Step 1: Test Details -->
+        <div id="step1" class="card">
+            <div class="card-header">
+                <h2 class="card-title">Step 1: Test Details</h2>
+            </div>
+            
+            <form id="testDetailsForm">
+                <div class="form-group">
+                    <label for="title">Test Title</label>
+                    <input type="text" id="title" required placeholder="e.g., JEE Main Mock Test 1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <textarea id="description" rows="3" placeholder="Brief description of the test"></textarea>
+                </div>
+                
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes)</label>
+                        <input type="number" id="duration" required value="180" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="totalMarks">Total Marks</label>
+                        <input type="number" id="totalMarks" required value="300" min="1">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Next: Upload PDF</button>
+            </form>
+        </div>
+
+        <!-- Step 2: PDF Upload -->
+        <div id="step2" class="card" style="display: none;">
+            <div class="card-header">
+                <h2 class="card-title">Step 2: Upload Question Paper PDF</h2>
+            </div>
+            
+            <div id="testInfo" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px;"></div>
+            
+            <form id="pdfUploadForm">
+                <div class="form-group">
+                    <label for="pdfFile">Select PDF File</label>
+                    <input type="file" id="pdfFile" accept="application/pdf" required>
+                    <small style="color: #666; display: block; margin-top: 8px;">Maximum file size: 50MB</small>
+                </div>
+                
+                <div id="uploadProgress" style="display: none;">
+                    <div class="spinner"></div>
+                    <p class="text-center">Uploading PDF...</p>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="backToStep1()" class="btn btn-secondary">Back</button>
+                    <button type="submit" class="btn btn-primary">Upload & Continue</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Message -->
+        <div id="successMessage" class="card" style="display: none; text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+            <h2>PDF Uploaded Successfully!</h2>
+            <p style="margin: 20px 0; color: #666;">Now you can start cropping questions from the PDF.</p>
+            <button onclick="goToCropper()" class="btn btn-primary btn-lg">Start Cropping Questions</button>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        requireAuth('creator');
+        
+        let currentTestId = null;
+        
+        // Check if editing existing test
+        const urlParams = new URLSearchParams(window.location.search);
+        const existingTestId = urlParams.get('testId');
+        
+        if (existingTestId) {
+            currentTestId = existingTestId;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            loadTestInfo(existingTestId);
+        }
+        
+        async function loadTestInfo(testId) {
+            try {
+                const data = await apiCall(`/tests/${testId}`);
+                document.getElementById('testInfo').innerHTML = `
+                    <h3 style="margin-bottom: 8px;">${data.test.title}</h3>
+                    <p style="color: #666;">${data.test.description || 'No description'}</p>
+                    <div style="margin-top: 12px; color: #666;">
+                        Duration: ${data.test.duration_minutes} min | Total Marks: ${data.test.total_marks}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load test:', error);
+            }
+        }
+        
+        document.getElementById('testDetailsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const testData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                durationMinutes: parseInt(document.getElementById('duration').value),
+                totalMarks: parseInt(document.getElementById('totalMarks').value)
+            };
+            
+            try {
+                const data = await apiCall('/tests', {
+                    method: 'POST',
+                    body: JSON.stringify(testData)
+                });
+                
+                currentTestId = data.test.id;
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+                
+                document.getElementById('testInfo').innerHTML = `
+                    <h3 style="margin-bottom: 8px;">${testData.title}</h3>
+                    <p style="color: #666;">${testData.description || 'No description'}</p>
+                    <div style="margin-top: 12px; color: #666;">
+                        Duration: ${testData.durationMinutes} min | Total Marks: ${testData.totalMarks}
+                    </div>
+                `;
+            } catch (error) {
+                alert('Failed to create test: ' + error.message);
+            }
+        });
+        
+        document.getElementById('pdfUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a PDF file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('pdf', file);
+            formData.append('testId', currentTestId);
+            
+            document.getElementById('uploadProgress').style.display = 'block';
+            
+            try {
+                const token = getAuthToken();
+                const response = await fetch(`${API_BASE}/tests/upload-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Upload failed');
+                }
+                
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            } catch (error) {
+                alert('Upload failed: ' + error.message);
+            } finally {
+                document.getElementById('uploadProgress').style.display = 'none';
+            }
+        });
+        
+        function backToStep1() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+        }
+        
+        function goToCropper() {
+            window.location.href = `pdf-cropper.html?testId=${currentTestId}`;
+        }
+    </script>
+</body>
+</html>

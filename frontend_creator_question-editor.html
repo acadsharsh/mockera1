@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Editor - JEE Mock Test</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+        .question-image {
+            max-width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-fill {
+            background: #667eea;
+            height: 100%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <ul class="nav-list">
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+            <li><a href="#" class="nav-link active">Question Editor</a></li>
+            <li><button onclick="logout()" class="btn btn-sm btn-secondary" style="margin-left: auto;">Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Add Question Details</h1>
+            <div>
+                <span id="progressText">Question 1 of 0</span>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        </div>
+
+        <div class="editor-container">
+            <div class="card">
+                <h3 style="margin-bottom: 20px;">Question Image</h3>
+                <img id="questionImage" class="question-image" alt="Question">
+                
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 20px;">Question Metadata</h3>
+                    
+                    <form id="questionForm">
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <select id="subject" required>
+                                    <option value="">Select subject...</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="questionType">Question Type</label>
+                                <select id="questionType" required onchange="updateAnswerFields()">
+                                    <option value="">Select type...</option>
+                                    <option value="MCQ">MCQ (Single Correct)</option>
+                                    <option value="MSQ">MSQ (Multiple Correct)</option>
+                                    <option value="NUMERICAL">Numerical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="mcqOptions" style="display: none;">
+                            <h4 style="margin: 20px 0 15px;">Option Labels (for selection)</h4>
+                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+                                The question image shows the actual options. These labels are for students to select their answer.
+                            </p>
+                            
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label for="optionA">Option A Label</label>
+                                    <input type="text" id="optionA" placeholder="e.g., Option A">
+                                </div>
+                                <div class="form-group">
+                                    <label for="optionB">Option B Label</label>
+                                    <input type="text" id="optionB" placeholder="e.g., Option B">
+                                </div>
+                                <div class="form-group">
+                                    <label for="optionC">Option C Label</label>
+                                    <input type="text" id="optionC" placeholder="e.g., Option C">
+                                </div>
+                                <div class="form-group">
+                                    <label for="optionD">Option D Label</label>
+                                    <input type="text" id="optionD" placeholder="e.g., Option D">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="correctAnswer">Correct Answer</label>
+                            <input type="text" id="correctAnswer" required 
+                                   placeholder="e.g., A or A,B or 2.5">
+                            <small style="color: #666;">For MCQ: A, B, C, or D. For MSQ: A,B,C. For Numerical: enter value</small>
+                        </div>
+
+                        <div class="grid grid-3">
+                            <div class="form-group">
+                                <label for="marks">Marks</label>
+                                <input type="number" id="marks" required value="4" min="1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="negativeMarks">Negative Marks</label>
+                                <input type="number" id="negativeMarks" value="-1" step="0.1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="difficulty">Difficulty</label>
+                                <select id="difficulty">
+                                    <option value="">Not set</option>
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="solutionText">Solution (Optional)</label>
+                            <textarea id="solutionText" rows="3" placeholder="Enter solution text"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 30px;">
+                            <button type="submit" class="btn btn-primary">
+                                Save & Next Question
+                            </button>
+                            <button type="button" onclick="skipQuestion()" class="btn btn-secondary">
+                                Skip for Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 20px;">Saved Questions</h3>
+                <div id="savedQuestions"></div>
+                
+                <button onclick="finishEditing()" class="btn btn-success" style="width: 100%; margin-top: 20px;">
+                    Finish & Go to Test Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        requireAuth('creator');
+        
+        const croppedImages = JSON.parse(sessionStorage.getItem('croppedImages') || '[]');
+        const testId = sessionStorage.getItem('currentTestId');
+        
+        if (!testId || croppedImages.length === 0) {
+            alert('No cropped images found');
+            window.location.href = 'dashboard.html';
+        }
+        
+        let currentQuestionIndex = 0;
+        let savedQuestionsCount = 0;
+        
+        function loadQuestion(index) {
+            if (index >= croppedImages.length) {
+                finishEditing();
+                return;
+            }
+            
+            currentQuestionIndex = index;
+            document.getElementById('questionImage').src = croppedImages[index];
+            document.getElementById('progressText').textContent = 
+                `Question ${index + 1} of ${croppedImages.length}`;
+            document.getElementById('progressFill').style.width = 
+                ((index / croppedImages.length) * 100) + '%';
+            
+            // Reset form
+            document.getElementById('questionForm').reset();
+            document.getElementById('marks').value = 4;
+            document.getElementById('negativeMarks').value = -1;
+        }
+        
+        function updateAnswerFields() {
+            const questionType = document.getElementById('questionType').value;
+            const mcqOptions = document.getElementById('mcqOptions');
+            
+            if (questionType === 'MCQ' || questionType === 'MSQ') {
+                mcqOptions.style.display = 'block';
+            } else {
+                mcqOptions.style.display = 'none';
+            }
+        }
+        
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const questionData = {
+                testId: testId,
+                questionNumber: currentQuestionIndex + 1,
+                subject: document.getElementById('subject').value,
+                questionType: document.getElementById('questionType').value,
+                imageUrl: croppedImages[currentQuestionIndex],
+                optionA: document.getElementById('optionA').value || null,
+                optionB: document.getElementById('optionB').value || null,
+                optionC: document.getElementById('optionC').value || null,
+                optionD: document.getElementById('optionD').value || null,
+                correctAnswer: document.getElementById('correctAnswer').value,
+                marks: parseInt(document.getElementById('marks').value),
+                negativeMarks: parseFloat(document.getElementById('negativeMarks').value),
+                solutionText: document.getElementById('solutionText').value || null,
+                difficulty: document.getElementById('difficulty').value || null
+            };
+            
+            try {
+                await apiCall('/questions', {
+                    method: 'POST',
+                    body: JSON.stringify(questionData)
+                });
+                
+                savedQuestionsCount++;
+                updateSavedQuestions();
+                
+                // Move to next question
+                loadQuestion(currentQuestionIndex + 1);
+            } catch (error) {
+                alert('Failed to save question: ' + error.message);
+            }
+        });
+        
+        function skipQuestion() {
+            if (confirm('Skip this question? You can add it later.')) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+        
+        function updateSavedQuestions() {
+            document.getElementById('savedQuestions').innerHTML = `
+                <div style="text-align: center; padding: 20px; background: #d1fae5; border-radius: 8px;">
+                    <div style="font-size: 2rem; font-weight: bold; color: #065f46;">
+                        ${savedQuestionsCount}
+                    </div>
+                    <div style="color: #065f46;">Questions Saved</div>
+                </div>
+            `;
+        }
+        
+        function finishEditing() {
+            if (savedQuestionsCount === 0) {
+                alert('Please save at least one question before finishing');
+                return;
+            }
+            
+            sessionStorage.removeItem('croppedImages');
+            sessionStorage.removeItem('currentTestId');
+            window.location.href = `test-settings.html?testId=${testId}`;
+        }
+        
+        loadQuestion(0);
+    </script>
+</body>
+</html>

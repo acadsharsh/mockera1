@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Mock Test Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>JEE Mock Test Platform</h1>
+            <p class="subtitle">Practice like the real exam</p>
+        </header>
+
+        <main class="landing-main">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">📝</div>
+                    <h2>Create Test</h2>
+                    <p>Upload question images and create custom mock tests with marking scheme</p>
+                    <a href="create-test.html" class="btn btn-primary">Create New Test</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon">✍️</div>
+                    <h2>Attempt Test</h2>
+                    <p>Take tests in NTA-style CBT interface with timer and question palette</p>
+                    <a href="attempt-test.html" class="btn btn-primary">Attempt Test</a>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h2>View Analysis</h2>
+                    <p>Detailed performance analysis with graphs and percentile tracking</p>
+                    <a href="analysis.html" class="btn btn-primary">View Analysis</a>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3>Your Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalTests">0</div>
+                        <div class="stat-label">Tests Created</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="testsAttempted">0</div>
+                        <div class="stat-label">Tests Attempted</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgScore">0%</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Load statistics
+        window.addEventListener('DOMContentLoaded', () => {
+            const tests = JSON.parse(localStorage.getItem('jeeTests') || '[]');
+            const results = JSON.parse(localStorage.getItem('jeeResults') || '[]');
+            
+            document.getElementById('totalTests').textContent = tests.length;
+            document.getElementById('testsAttempted').textContent = results.length;
+            
+            if (results.length > 0) {
+                const avgScore = results.reduce((sum, r) => sum + r.percentage, 0) / results.length;
+                document.getElementById('avgScore').textContent = avgScore.toFixed(1) + '%';
+            }
+        });
+    </script>
+</body>
+</html>

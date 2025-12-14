@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Result - JEE Mock Test</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Test Result</h1>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+
+        <div id="resultContent">
+            <div class="result-summary">
+                <h2 id="testName">Test Name</h2>
+                <div class="score-display" id="scoreDisplay">0%</div>
+                <p style="font-size: 1.2rem;">
+                    <span id="marksObtained">0</span> / <span id="totalMarks">300</span> Marks
+                </p>
+                <p style="margin-top: 10px; opacity: 0.9;">
+                    Time Taken: <span id="timeTaken">--</span>
+                </p>
+            </div>
+
+            <div class="content-card">
+                <h3 style="margin-bottom: 20px; color: #333;">Performance Overview</h3>
+                
+                <div class="result-grid">
+                    <div class="result-card" style="border-left-color: #10b981;">
+                        <h3>Correct Answers</h3>
+                        <div class="value" id="correctCount" style="color: #10b981;">0</div>
+                    </div>
+                    <div class="result-card" style="border-left-color: #ef4444;">
+                        <h3>Incorrect Answers</h3>
+                        <div class="value" id="incorrectCount" style="color: #ef4444;">0</div>
+                    </div>
+                    <div class="result-card" style="border-left-color: #f59e0b;">
+                        <h3>Unanswered</h3>
+                        <div class="value" id="unansweredCount" style="color: #f59e0b;">0</div>
+                    </div>
+                    <div class="result-card" style="border-left-color: #667eea;">
+                        <h3>Accuracy</h3>
+                        <div class="value" id="accuracy" style="color: #667eea;">0%</div>
+                    </div>
+                </div>
+
+                <div class="section-analysis">
+                    <h3>Section-wise Performance</h3>
+                    <div class="section-bars">
+                        <div class="bar-item">
+                            <div class="bar-label">Physics</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="physicsBar" style="width: 0%"></div>
+                            </div>
+                            <div class="bar-value" id="physicsScore">0/0</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Chemistry</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="chemistryBar" style="width: 0%; background: #10b981;"></div>
+                            </div>
+                            <div class="bar-value" id="chemistryScore" style="color: #10b981;">0/0</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Mathematics</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="mathsBar" style="width: 0%; background: #f59e0b;"></div>
+                            </div>
+                            <div class="bar-value" id="mathsScore" style="color: #f59e0b;">0/0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">Percentile Rank</h3>
+                    <div class="form-group">
+                        <label>Enter Percentile (Optional - for tracking)</label>
+                        <input type="number" id="percentileInput" step="0.01" min="0" max="100" 
+                               placeholder="e.g., 98.5">
+                    </div>
+                    <button class="btn btn-primary" onclick="savePercentile()">
+                        Save Percentile
+                    </button>
+                    <div id="percentileSaved" style="margin-top: 10px; color: #10b981; font-weight: 600; display: none;">
+                        ✓ Percentile saved!
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center;">
+                    <a href="analysis.html" id="analysisLink" class="btn btn-primary">
+                        📊 View Detailed Analysis
+                    </a>
+                    <a href="attempt-test.html" class="btn btn-secondary">
+                        Attempt Another Test
+                    </a>
+                    <a href="index.html" class="btn btn-secondary">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/result.js"></script>
+</body>
+</html>
